@@ -3,7 +3,7 @@
 
 ## Installation
 ```
-go get https://github.com/krecu/go-adstxt
+go get github.com/krecu/go-adstxt
 cd $GOPATH/src/github.com/krecu/go-adstxt && go test -v
 ```
 
