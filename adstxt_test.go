@@ -16,7 +16,7 @@ func TestAdxTxt_Check(t *testing.T) {
 		t.Fail()
 	}
 
-	adsGood := adx.Check("https://www.sports.ru")
+	adsGood := adx.Check("http://www.shkolazhizni.ru")
 	if len(adsGood.Ads) == 0 {
 		t.Fail()
 	} else {

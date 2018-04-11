@@ -50,7 +50,11 @@ func New(opt Options) (proto *AdsTxt, err error) {
 		defaultTransport.MaxIdleConns = proto.opt.HttpMaxIdleConns
 		defaultTransport.MaxIdleConnsPerHost = proto.opt.HttpMaxIdleConnsPerHost
 
-		proto.client = &http.Client{Transport: &defaultTransport, Timeout: opt.HttpTimeout}
+		proto.client = &http.Client{
+			Transport:     &defaultTransport,
+			Timeout:       opt.HttpTimeout,
+			CheckRedirect: nil,
+		}
 	}
 
 	return
@@ -103,8 +107,13 @@ func (ads *AdsTxt) Check(host string) (site *AdSite) {
 	req.Header.Set("User-Agent", "AdsTxtCrawler/1.0; +https://github.com/krecu/go-adstxt")
 
 	res, err = ads.client.Do(req)
-	if err != nil {
+	if err != nil && res == nil {
 		site.Error = append(site.Error, ErrAdsReqFail)
+		return
+	}
+
+	if !strings.Contains(res.Header.Get("Content-Type"), "text/plain") {
+		site.Error = append(site.Error, ErrAdsReqHeader)
 		return
 	}
 
@@ -137,6 +146,15 @@ func (ads *AdsTxt) Check(host string) (site *AdSite) {
 					continue
 				}
 			} else {
+
+				if len(line) > 0 {
+					if string([]rune(line[0])[0]) == "#" {
+						continue
+					}
+				} else {
+					continue
+				}
+
 				// clear space
 				for i, l := range line {
 					line[i] = strings.Trim(l, " ")
@@ -144,8 +162,6 @@ func (ads *AdsTxt) Check(host string) (site *AdSite) {
 
 				// check require field
 				switch len(line) {
-				case 0:
-					site.Error = append(site.Error, fmt.Errorf("LINE: %d, err: %s", pos, ErrAdsWrongLine))
 				case 1:
 					site.Error = append(site.Error, fmt.Errorf("LINE: %d, err: %s", pos, ErrAdsWrongId))
 				case 2:

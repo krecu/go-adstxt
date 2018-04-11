@@ -4,6 +4,7 @@ import "fmt"
 
 var (
 	ErrAdsReqFail     = fmt.Errorf("ads.txt request fail")
+	ErrAdsReqHeader   = fmt.Errorf("ads.txt request bad content type")
 	ErrAdsReqStatus   = fmt.Errorf("ads.txt bad response status")
 	ErrAdsReqNotFound = fmt.Errorf("ads.txt not found")
 
