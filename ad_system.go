@@ -1,8 +1,11 @@
 package go_adstxt
 
+import "fmt"
+
 const (
 	ADS_DIRECT   = "DIRECT"
 	ADS_RESELLER = "RESELLER"
+	ADS_SELLER   = "SELLER"
 )
 
 type AdSystem struct {
@@ -13,7 +16,7 @@ type AdSystem struct {
 	facilitate WHOIS and reverse IP lookups to establish clear ownership of the delegate system. Ideally the SSP or
 	Exchange publishes a document detailing what domain name to use.
 	*/
-	Domain string
+	Domain string `json:"domain"`
 
 	/* Publisher’s Account ID
 	(Required) The identifier associated with the seller or reseller account within the advertising system in
@@ -21,7 +24,7 @@ type AdSystem struct {
 	field specified by the SSP/exchange. Typically, in OpenRTB, this is publisher.id. For OpenDirect it is
 	typically the publisher’s organization ID.
 	*/
-	ID string
+	ID string `json:"id"`
 
 	/* Type of Account/Relationship
 	(Required) An enumeration of the type of account. A value of ‘DIRECT’ indicates that the Publisher (content owner)
@@ -31,14 +34,14 @@ type AdSystem struct {
 	field #1. Other types may be added in the future. Note that this field should be treated as case insensitive when
 	interpreting the data.
 	*/
-	Type string
+	Type string `json:"type"`
 
 	/* Certification Authority ID
 	(Optional) An ID that uniquely identifies the advertising system within a certification authority
 	(this ID maps to the entity listed in field #1). A current certification authority is the Trustworthy
 	Accountability Group (aka TAG), and the TAGID would be included here [11].
 	*/
-	AuthorityID string
+	AuthorityID string `json:"authority_id"`
 }
 
 func (ads *AdSystem) Validate() (err []error) {
@@ -49,7 +52,7 @@ func (ads *AdSystem) Validate() (err []error) {
 	if len(ads.ID) < 1 {
 		err = append(err, ErrAdsWrongId)
 	}
-	if len(ads.Type) < 6 || (ads.Type != ADS_DIRECT && ads.Type != ADS_RESELLER) {
+	if len(ads.Type) < 6 || (ads.Type != ADS_DIRECT && ads.Type != ADS_RESELLER && ads.Type != fmt.Sprintf("%s/%s", ADS_SELLER, ADS_RESELLER)) {
 		err = append(err, ErrAdsWrongType)
 	}
 
